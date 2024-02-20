@@ -1,0 +1,12 @@
+
+### Register
+POST http://localhost:5000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "phone": "0383911193",
+  "email": "tienco201@gmail.com",
+  "fullname": "Trần Văn Tiến",
+  "address": "Hà Nam",
+  "role_id": 1
+}
