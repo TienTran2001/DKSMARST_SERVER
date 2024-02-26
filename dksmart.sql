@@ -69,6 +69,7 @@ GO
 CREATE TABLE provinces (
     province_id INT PRIMARY KEY AUTO_INCREMENT,
     province_name VARCHAR(100) 
+)
 GO
 -- Bảng trung tâm đăng kiểm
 CREATE TABLE centers (

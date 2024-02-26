@@ -31,7 +31,6 @@ router.put(
     Joi.object({
       email: stringReq,
       fullname: stringReq,
-      password: stringReq,
       address: string,
       roleId: numberReq,
     })

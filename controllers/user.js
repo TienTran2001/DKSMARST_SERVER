@@ -85,8 +85,8 @@ const addUserByAdmin = asyncHandler(async (req, res, next) => {
   return res.json({
     success: newUser ? true : false,
     message: newUser
-      ? 'Tạo tài khoản thành công.'
-      : 'Tạo tài khoản không thành công.',
+      ? 'Đăng ký tài khoản thành công.'
+      : 'Đăng ký tài khoản không thành công.',
   });
 });
 
@@ -102,7 +102,8 @@ const updateUser = asyncHandler(async (req, res, next) => {
       res,
       next
     );
-  const existEmail = await authRepository.findByEmailAsync(existUser.email);
+  const existEmail = await authRepository.findByEmailAsync(email);
+
   if (existEmail && email !== existUser.email)
     return throwErrorWithStatus(
       statusCode.UNAUTHORIZED,
