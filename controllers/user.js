@@ -8,7 +8,20 @@ const { Op } = require('sequelize');
 // lấy thông tin user hiện tại
 const getCurrent = asyncHandler(async (req, res) => {
   const { userId } = req.user;
+  console.log('hih');
   const response = await authRepository.findByIdAsync(userId);
+  return res.json({
+    success: response ? true : false,
+    message: response ? 'Lấy thành công' : 'Lấy thất bại',
+    currentUser: response,
+  });
+});
+
+// lấy thông tin user theo id
+const getById = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const response = await authRepository.findByIdAsync(userId);
+  console.log(response);
   return res.json({
     success: response ? true : false,
     message: response ? 'Lấy thành công' : 'Lấy thất bại',
@@ -149,4 +162,5 @@ module.exports = {
   updateUser,
   getAllUser,
   deleteUser,
+  getById,
 };

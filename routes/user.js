@@ -6,6 +6,7 @@ const { stringReq, numberReq, string } = require('../middlewares/joiSchema');
 const { verifyToken, isAdmin } = require('../middlewares/verifyToken');
 
 router.get('/current', verifyToken, controllers.getCurrent);
+router.get('/:userId', verifyToken, isAdmin, controllers.getById);
 router.get('/', verifyToken, isAdmin, controllers.getAllUser);
 router.post(
   '/',
