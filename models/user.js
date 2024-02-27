@@ -50,6 +50,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         field: 'role_id',
       },
+      centerId: {
+        type: DataTypes.INTEGER,
+        field: 'center_id',
+        references: {
+          model: 'centers', // Thay thế bằng tên thực của bảng provinces
+          key: 'center_id',
+        },
+      },
     },
     {
       sequelize,

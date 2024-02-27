@@ -21,6 +21,9 @@ CREATE TABLE users (
     role_id INT,
     FOREIGN KEY (role_id) REFERENCES roles(role_id)
 )
+ALTER TABLE users
+ADD COLUMN center_id INT DEFAULT 0,
+ADD FOREIGN KEY (center_id) REFERENCES centers(center_id);
 GO
 
 -- Bảng phương tiện
@@ -77,11 +80,14 @@ CREATE TABLE centers (
     name VARCHAR(255),
     address VARCHAR(255),
     phone VARCHAR(11),
+    operating_hours VARCHAR(255)
     created_at DATETIME,
     updated_at DATETIME,
     province_id INT,
     FOREIGN KEY (province_id) REFERENCES provinces(province_id)
 )
+ALTER TABLE centers
+ADD COLUMN status ENUM('đang nhận lịch', 'ngưng nhận lịch') NOT NULL DEFAULT 'đang nhận lịch';
 GO
 -- Bảng trạng thái ca đăng kiểm
 CREATE TABLE shift_statuses (

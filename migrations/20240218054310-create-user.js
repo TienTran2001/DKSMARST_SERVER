@@ -43,10 +43,18 @@ module.exports = {
       roleId: {
         type: DataTypes.INTEGER,
         references: {
-          model: 'Roles',
-          key: 'roleId',
+          model: 'roles',
+          key: 'role_id',
         },
         field: 'role_id',
+      },
+      centerId: {
+        type: DataTypes.INTEGER,
+        field: 'center_id',
+        references: {
+          model: 'centers', // Thay thế bằng tên thực của bảng provinces
+          key: 'center_id',
+        },
       },
     });
   },
