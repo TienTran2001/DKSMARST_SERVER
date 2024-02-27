@@ -4,6 +4,19 @@ const db = require('../models');
 const { provinceRepository } = require('../repositories');
 const { throwErrorWithStatus } = require('../middlewares/errorHandler');
 
+// lay tinh thanh theo id
+const getProvinceById = asyncHandler(async (req, res) => {
+  const { provinceId } = req.params;
+  const response = await provinceRepository.getProvinceByIdAsync(provinceId);
+  return res.json({
+    success: response ? true : false,
+    message: response
+      ? 'Lấy tỉnh thành thành công.'
+      : 'Lấy tỉnh thành thất bại.',
+    province: response,
+  });
+});
+
 // lấy danh sách tỉnh thành
 const getAllProvince = asyncHandler(async (req, res) => {
   const response = await provinceRepository.getAllProvinceAsync();
@@ -104,4 +117,5 @@ module.exports = {
   addProvince,
   updateProvince,
   deleteProvince,
+  getProvinceById,
 };

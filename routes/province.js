@@ -5,6 +5,7 @@ const validateDTO = require('../middlewares/validation');
 const { stringReq, numberReq } = require('../middlewares/joiSchema');
 const { verifyToken, isAdmin } = require('../middlewares/verifyToken');
 
+router.get('/:provinceId', controllers.getProvinceById);
 router.get('/', controllers.getAllProvince);
 router.post(
   '/',
