@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const statusCode = require('../utils/statusCode');
 const { centerRepository } = require('../repositories');
 const { Op } = require('sequelize');
+const { throwErrorWithStatus } = require('../middlewares/errorHandler');
 
 //lay danh sach trung tam
 
@@ -47,6 +48,98 @@ const getAllCenter = asyncHandler(async (req, res) => {
   });
 });
 
+// lay trung tam theo id
+const getCenterById = asyncHandler(async (req, res) => {
+  const { centerId } = req.params;
+  const response = await centerRepository.getCenterById(centerId);
+  return res.json({
+    success: response ? true : false,
+    message: response ? 'Lấy trung tâm thành công.' : 'Lấy trung tâm thất bại.',
+    center: response,
+  });
+});
+
+// thêm trung tâm
+const addCenter = asyncHandler(async (req, res, next) => {
+  const { name } = req.body;
+
+  const existCenter = await centerRepository.getCenterByNameAsync(name);
+
+  if (existCenter)
+    return throwErrorWithStatus(
+      statusCode.BAD_REQUEST,
+      'Trung tâm đăng kiểm đã tồn tại.',
+      res,
+      next
+    );
+
+  const newCenter = await centerRepository.addCenterAsync(req.body);
+  return res.json({
+    success: newCenter ? true : false,
+    message: newCenter
+      ? 'Tạo trung tâm thành công.'
+      : 'Tạo trung tâm không thành công.',
+  });
+});
+
+// update trung tâm
+const updateCenter = asyncHandler(async (req, res, next) => {
+  const { centerId } = req.params;
+  const { name } = req.body;
+
+  const existCenter = await centerRepository.getCenterById(centerId);
+
+  if (!existCenter) {
+    return throwErrorWithStatus(
+      statusCode.NOTFOUND,
+      'Trung tâm đăng kiểm không tồn tại.',
+      res,
+      next
+    );
+  }
+
+  const existName = await centerRepository.getCenterByNameAsync(name);
+  if (existName && existName.name !== existCenter.name)
+    return throwErrorWithStatus(
+      statusCode.BAD_REQUEST,
+      'Trung tâm đăng kiểm đã tồn tại.',
+      res,
+      next
+    );
+
+  const newCenter = await centerRepository.updateCenterAsync(req, centerId);
+  return res.json({
+    success: newCenter ? true : false,
+    message: newCenter
+      ? 'Trung tâm đăng kiểm cập nhật thành công.'
+      : 'Trung tâm đăng kiểm cập nhật thành công.',
+  });
+});
+
+// xoa trung tâm
+const deleteCenter = asyncHandler(async (req, res, next) => {
+  const { centerId } = req.params;
+
+  const existCenter = await centerRepository.getCenterById(centerId);
+  if (!existCenter)
+    return throwErrorWithStatus(
+      statusCode.NOTFOUND,
+      'Trung tâm đăng kiểm không tồn tại.',
+      res,
+      next
+    );
+
+  const response = await centerRepository.deleteCenterAsync(centerId);
+  return res.json({
+    success: response ? true : false,
+    message: response ? 'Xóa trung tâm thành công.' : 'Xóa trung t thành công.',
+  });
+});
+
 module.exports = {
   getAllCenter,
+  addCenter,
+  getCenterById,
+  updateCenter,
+  deleteCenter,
 };

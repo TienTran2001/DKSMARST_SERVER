@@ -70,7 +70,7 @@ const updateProvince = asyncHandler(async (req, res, next) => {
     );
 
   const existName = await provinceRepository.getProvinceByNameAsync(name);
-  if (existName)
+  if (existName && existName.name !== existProvince.name)
     return throwErrorWithStatus(
       statusCode.BAD_REQUEST,
       'Tỉnh thành đã tồn tại.',
