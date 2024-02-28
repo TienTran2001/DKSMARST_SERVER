@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const getAllCenterAsync = asyncHandler(async (query) => {
   return await db.Center.findAll({
     where: query,
+    include: [{ model: db.Province, attributes: ['name'] }],
   });
 });
 
