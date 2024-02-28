@@ -22,7 +22,7 @@ CREATE TABLE users (
     FOREIGN KEY (role_id) REFERENCES roles(role_id)
 )
 ALTER TABLE users
-ADD COLUMN center_id INT DEFAULT 0,
+ADD COLUMN center_id INT,
 ADD FOREIGN KEY (center_id) REFERENCES centers(center_id);
 GO
 
