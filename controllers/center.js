@@ -3,6 +3,7 @@ const statusCode = require('../utils/statusCode');
 const { centerRepository } = require('../repositories');
 const { Op } = require('sequelize');
 const { throwErrorWithStatus } = require('../middlewares/errorHandler');
+const db = require('../models');
 
 //lay danh sach trung tam
 
@@ -37,11 +38,12 @@ const getAllCenter = asyncHandler(async (req, res) => {
   const centers = await db.Center.findAndCountAll({
     where: query,
     ...options,
+    include: [{ model: db.Province, attributes: ['name'] }],
   });
   return res.json({
-    success: centers.length > 0 ? true : false,
+    success: centers.count > 0 ? true : false,
     message:
-      centers.length > 0
+      centers.count > 0
         ? 'Lấy danh sách thành công.'
         : 'Lấy danh sách không thành công.',
     centers,
