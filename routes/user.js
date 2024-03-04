@@ -32,7 +32,6 @@ router.put(
       email: stringReq,
       fullname: stringReq,
       address: string,
-      roleId: numberReq,
     })
   ),
   controllers.updateCurrent
