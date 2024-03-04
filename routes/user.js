@@ -25,6 +25,19 @@ router.post(
   controllers.addUserByAdmin
 );
 router.put(
+  '/current',
+  verifyToken,
+  validateDTO(
+    Joi.object({
+      email: stringReq,
+      fullname: stringReq,
+      address: string,
+      roleId: numberReq,
+    })
+  ),
+  controllers.updateCurrent
+);
+router.put(
   '/:userId',
   verifyToken,
   isAdmin,

@@ -134,6 +134,37 @@ const updateUser = asyncHandler(async (req, res, next) => {
   });
 });
 
+// Sua tai khoan
+const updateCurrent = asyncHandler(async (req, res, next) => {
+  const { userId } = req.user;
+  const { email } = req.body;
+  const existUser = await authRepository.findByIdAsync(userId);
+  if (!existUser)
+    return throwErrorWithStatus(
+      statusCode.NOTFOUND,
+      'Tài khoản không tồn tại.',
+      res,
+      next
+    );
+  const existEmail = await authRepository.findByEmailAsync(email);
+
+  if (existEmail && email !== existUser.email)
+    return throwErrorWithStatus(
+      statusCode.UNAUTHORIZED,
+      'Email đã tồn tại.',
+      res,
+      next
+    );
+
+  const response = await authRepository.updateUserAsync(req, userId);
+  return res.json({
+    success: response ? true : false,
+    message: response
+      ? 'Cập nhật tài khoản thành công.'
+      : 'Cập nhật khoản không thành công.',
+  });
+});
+
 // xoa tai khoan
 const deleteUser = asyncHandler(async (req, res, next) => {
   const { userId } = req.params;
@@ -163,4 +194,5 @@ module.exports = {
   getAllUser,
   deleteUser,
   getById,
+  updateCurrent,
 };
