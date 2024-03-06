@@ -2,7 +2,12 @@ const router = require('express').Router();
 const Joi = require('joi');
 const controllers = require('../controllers/user');
 const validateDTO = require('../middlewares/validation');
-const { stringReq, numberReq, string } = require('../middlewares/joiSchema');
+const {
+  stringReq,
+  numberReq,
+  string,
+  number,
+} = require('../middlewares/joiSchema');
 const { verifyToken, isAdmin } = require('../middlewares/verifyToken');
 
 router.get('/current', verifyToken, controllers.getCurrent);
@@ -20,6 +25,7 @@ router.post(
       password: stringReq,
       address: string,
       roleId: numberReq,
+      centerId: number,
     })
   ),
   controllers.addUserByAdmin
@@ -46,6 +52,7 @@ router.put(
       fullname: stringReq,
       address: string,
       roleId: numberReq,
+      centerId: number,
     })
   ),
   controllers.updateUser
