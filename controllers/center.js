@@ -134,7 +134,7 @@ const deleteCenter = asyncHandler(async (req, res, next) => {
   const response = await centerRepository.deleteCenterAsync(centerId);
   return res.json({
     success: response ? true : false,
-    message: response ? 'Xóa trung tâm thành công.' : 'Xóa trung t thành công.',
+    message: response ? 'Xóa trung tâm thành công.' : 'Xóa trung tâm thất bại.',
   });
 });
 

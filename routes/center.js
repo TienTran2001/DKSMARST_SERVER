@@ -23,6 +23,7 @@ router.post(
   ),
   controllers.addCenter
 );
+
 router.put(
   '/:centerId',
   verifyToken,

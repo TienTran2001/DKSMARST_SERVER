@@ -6,6 +6,7 @@ const auth = require('./auth');
 const user = require('./user');
 const province = require('./province');
 const center = require('./center');
+const vehicle = require('./vehicle');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -14,6 +15,7 @@ const initRoutes = (app) => {
   app.use(`/api/v1/users`, user);
   app.use(`/api/v1/provinces`, province);
   app.use(`/api/v1/centers`, center);
+  app.use(`/api/v1/vehicles`, vehicle);
 
   app.use(badRequestException);
   app.use(errHandler);
