@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const getAllVehicleAsync = asyncHandler(async (query) => {
   return await db.Vehicle.findAll({
     where: query,
+    order: [['createdAt', 'DESC']],
   });
 });
 

@@ -67,8 +67,8 @@ const addVehicle = asyncHandler(async (req, res, next) => {
   return res.json({
     success: newVehicle ? true : false,
     message: newVehicle
-      ? 'Tạo phương tiện thành công.'
-      : 'Tạo phương tiện không thành công.',
+      ? 'Đăng ký phương tiện thành công.'
+      : 'Đăng ký tiện không thành công.',
     newVehicle,
   });
 });
@@ -121,7 +121,7 @@ const deleteVehicle = asyncHandler(async (req, res, next) => {
   return res.json({
     success: response ? true : false,
     message: response
-      ? 'Xóa phương tiên thành công.'
+      ? 'Xóa phương tiện thành công.'
       : 'Xóa phương tiện thất bại.',
   });
 });
