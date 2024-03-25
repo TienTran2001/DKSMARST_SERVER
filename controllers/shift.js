@@ -9,7 +9,7 @@ const db = require('../models');
 const getAllShift = asyncHandler(async (req, res) => {
   const { date, ...query } = req.query;
   const { centerId } = req.params;
-  console.log(centerId);
+
   // filter
   if (date) {
     query.registrationDate = {
@@ -22,9 +22,7 @@ const getAllShift = asyncHandler(async (req, res) => {
   return res.json({
     success: shifts.length > 0 ? true : false,
     message:
-      shifts.length > 0
-        ? 'Lấy danh sách thành công.'
-        : 'Lấy danh sách không thành công.',
+      shifts.length > 0 ? 'Lấy danh sách thành công.' : 'Không có dữ liệu.',
     shifts,
   });
 });
@@ -37,6 +35,18 @@ const getShiftById = asyncHandler(async (req, res) => {
     success: shift ? true : false,
     message: shift ? 'Lấy thành công.' : 'Lấy không thành công.',
     shift,
+  });
+});
+const getShiftDetailById = asyncHandler(async (req, res) => {
+  const { shiftDetailId } = req.params;
+  console.log(shiftDetailId);
+  const shiftDetail = await shiftRepository.getShiftDetailAsync({
+    shiftDetailId,
+  });
+  return res.json({
+    success: shiftDetail ? true : false,
+    message: shiftDetail ? 'Lấy thành công.' : 'Lấy không thành công.',
+    shiftDetail,
   });
 });
 
@@ -115,6 +125,19 @@ const addShift = asyncHandler(async (req, res, next) => {
     newShift,
   });
 });
+// thêm shift detail
+const addShiftDetail = asyncHandler(async (req, res, next) => {
+  const { shiftId } = req.params;
+  req.body.quantity = 0;
+  req.body.shiftId = shiftId;
+  console.log(req.body);
+  const response = await shiftRepository.addShiftDetailAsync(req.body);
+  return res.json({
+    success: response ? true : false,
+    message: response ? 'Thêm ca thành công.' : 'Thêm ca không thành công.',
+    newShiftDetail: response,
+  });
+});
 
 // update
 const updateShift = asyncHandler(async (req, res, next) => {
@@ -151,6 +174,22 @@ const updateShift = asyncHandler(async (req, res, next) => {
       : 'Ngày làm việc cập nhật thành công.',
   });
 });
+// update shift detail
+const updateShiftDetail = asyncHandler(async (req, res, next) => {
+  const { shiftDetailId } = req.params;
+
+  const newShiftDetail = await shiftRepository.updateShiftDetailAsync(
+    req,
+    shiftDetailId
+  );
+
+  return res.json({
+    success: newShiftDetail ? true : false,
+    message: newShiftDetail
+      ? 'Ca cập nhật thành công.'
+      : 'Ca cập nhật thành công.',
+  });
+});
 
 // xoa
 const deleteShift = asyncHandler(async (req, res, next) => {
@@ -181,6 +220,31 @@ const deleteShift = asyncHandler(async (req, res, next) => {
       : 'Xóa ngày làm việc thất bại.',
   });
 });
+// xoa shift detail
+const deleteShiftDetail = asyncHandler(async (req, res, next) => {
+  const { shiftDetailId } = req.params;
+
+  console.log(shiftDetailId);
+  console.log('hihi');
+  const existShiftDetail = await shiftRepository.getShiftDetailAsync({
+    shiftDetailId,
+  });
+  if (!existShiftDetail)
+    return throwErrorWithStatus(
+      statusCode.NOTFOUND,
+      'Ca không tồn tại.',
+      res,
+      next
+    );
+
+  const response = await shiftRepository.deleteShiftDetailAsync({
+    shiftDetailId,
+  });
+  return res.json({
+    success: response ? true : false,
+    message: response ? 'Xóa ca thành công.' : 'Xóa ca thất bại.',
+  });
+});
 
 module.exports = {
   getAllShift,
@@ -188,4 +252,8 @@ module.exports = {
   addShift,
   updateShift,
   deleteShift,
+  addShiftDetail,
+  deleteShiftDetail,
+  getShiftDetailById,
+  updateShiftDetail,
 };

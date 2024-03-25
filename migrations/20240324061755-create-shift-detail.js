@@ -32,7 +32,7 @@ module.exports = {
         field: 'max_quantity',
       },
       status: {
-        type: DataTypes.ENUM('Đang nhận lịch', 'Ngưng Nhận lịch', 'Đã đầy'),
+        type: DataTypes.ENUM('Đang nhận lịch', 'Ngưng nhận lịch', 'Đã đầy'),
         allowNull: false,
         defaultValue: 'Đang nhận lịch',
       },

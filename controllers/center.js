@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const statusCode = require('../utils/statusCode');
-const { centerRepository } = require('../repositories');
+const { centerRepository, authRepository } = require('../repositories');
 const { Op } = require('sequelize');
 const { throwErrorWithStatus } = require('../middlewares/errorHandler');
 const db = require('../models');
@@ -118,6 +118,49 @@ const updateCenter = asyncHandler(async (req, res, next) => {
   });
 });
 
+// quản trị trung tâm update trung tâm
+const updateCenterByManagerCenter = asyncHandler(async (req, res, next) => {
+  const { userId } = req.user;
+  const { name } = req.body;
+
+  const user = await authRepository.findByIdAsync(userId);
+  if (!user) {
+    return;
+  }
+  console.log(user.centerId);
+
+  const existCenter = await centerRepository.getCenterById(user.centerId);
+
+  if (!existCenter) {
+    return throwErrorWithStatus(
+      statusCode.NOTFOUND,
+      'Trung tâm đăng kiểm không tồn tại.',
+      res,
+      next
+    );
+  }
+
+  const existName = await centerRepository.getCenterByNameAsync(name);
+  if (existName && existName.name !== existCenter.name)
+    return throwErrorWithStatus(
+      statusCode.BAD_REQUEST,
+      'Trung tâm đăng kiểm đã tồn tại.',
+      res,
+      next
+    );
+
+  const newCenter = await centerRepository.updateCenterAsync(
+    req,
+    user.centerId
+  );
+  return res.json({
+    success: newCenter ? true : false,
+    message: newCenter
+      ? 'Trung tâm đăng kiểm cập nhật thành công.'
+      : 'Trung tâm đăng kiểm cập nhật thành công.',
+  });
+});
+
 // xoa trung tâm
 const deleteCenter = asyncHandler(async (req, res, next) => {
   const { centerId } = req.params;
@@ -144,4 +187,5 @@ module.exports = {
   getCenterById,
   updateCenter,
   deleteCenter,
+  updateCenterByManagerCenter,
 };

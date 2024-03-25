@@ -11,6 +11,11 @@ const {
 
 router.get('/shifts/:centerId', verifyToken, controllers.getAllShift);
 router.get('/shift/:shiftId', verifyToken, controllers.getShiftById);
+router.get(
+  '/shift-detail/:shiftDetailId',
+  verifyToken,
+  controllers.getShiftDetailById
+);
 router.post(
   '/shifts',
   verifyToken,
@@ -21,6 +26,20 @@ router.post(
     })
   ),
   controllers.addShift
+);
+router.post(
+  '/shift-details/:shiftId',
+  verifyToken,
+  isCenter,
+  validateDTO(
+    Joi.object({
+      startTime: stringReq,
+      endTime: stringReq,
+      maxQuantity: numberReq,
+      status: numberReq,
+    })
+  ),
+  controllers.addShiftDetail
 );
 router.put(
   '/shifts/:shiftId',
@@ -33,12 +52,32 @@ router.put(
   ),
   controllers.updateShift
 );
+router.put(
+  '/shift-details/:shiftDetailId',
+  verifyToken,
+  isCenter,
+  validateDTO(
+    Joi.object({
+      startTime: stringReq,
+      endTime: stringReq,
+      maxQuantity: numberReq,
+      status: numberReq,
+    })
+  ),
+  controllers.updateShiftDetail
+);
 
 router.delete(
   '/shifts/:shiftId',
   verifyToken,
   isCenter,
   controllers.deleteShift
+);
+router.delete(
+  '/shift-details/:shiftDetailId',
+  verifyToken,
+  isCenter,
+  controllers.deleteShiftDetail
 );
 
 module.exports = router;
