@@ -7,22 +7,36 @@ const db = require('../models');
 
 //lay danh ngay dang kiem
 const getAllShift = asyncHandler(async (req, res) => {
-  const { date, ...query } = req.query;
+  const { limit, page, date, ...query } = req.query;
   const { centerId } = req.params;
-
+  const options = {};
   // filter
   if (date) {
     query.registrationDate = {
       [Op.substring]: date,
     };
   }
-  query.centerId = centerId;
-  const shifts = await shiftRepository.getAllShiftAsync(query);
 
+  const prevPage = page - 1 >= 0 ? +page + 1 : 1;
+  const offset = (prevPage - 1) * limit;
+
+  if (offset) options.offset = offset;
+  options.limit = +limit;
+
+  query.centerId = centerId;
+
+  const shifts = await shiftRepository.getAllShiftAsync(query, options);
+  let totalPage = 0;
+  if (shifts.rows.length > 0) {
+    totalPage = Math.ceil(shifts.count / limit);
+  }
   return res.json({
-    success: shifts.length > 0 ? true : false,
+    success: shifts.rows.length > 0 ? true : false,
     message:
-      shifts.length > 0 ? 'Lấy danh sách thành công.' : 'Không có dữ liệu.',
+      shifts.rows.length > 0
+        ? 'Lấy danh sách thành công.'
+        : 'Không có dữ liệu.',
+    totalPage,
     shifts,
   });
 });

@@ -33,24 +33,12 @@ const getById = asyncHandler(async (req, res) => {
 const getAllUser = asyncHandler(async (req, res) => {
   const { limit, page, phone, ...query } = req.query;
   const options = {};
-  if (!limit) {
-    // filter
-    if (phone) {
-      query.phone = {
-        [Op.substring]: phone,
-      };
-    }
-
-    const users = await authRepository.getAllUserAsync(query);
-
-    return res.json({
-      success: users.length > 0 ? true : false,
-      message:
-        users.length > 0
-          ? 'Lấy danh sách thành công.'
-          : 'Lấy danh sách không thành công.',
-      users,
-    });
+  console.log({ phone, limit, page });
+  // filter
+  if (phone) {
+    query.phone = {
+      [Op.substring]: phone,
+    };
   }
 
   const prevPage = page - 1 >= 0 ? +page + 1 : 1;
@@ -59,16 +47,17 @@ const getAllUser = asyncHandler(async (req, res) => {
   if (offset) options.offset = offset;
   options.limit = +limit;
   console.log(options);
-  const users = await db.User.findAndCountAll({
-    where: query,
-    ...options,
-  });
+  const users = await authRepository.getAllUserAsync(query, options);
+  console.log(users);
+  let totalPage = 0;
+  if (users.rows.length > 0) {
+    totalPage = Math.ceil(users.count / limit);
+  }
   return res.json({
-    success: users.length > 0 ? true : false,
+    success: users.rows.length > 0 ? true : false,
     message:
-      users.length > 0
-        ? 'Lấy danh sách thành công.'
-        : 'Lấy danh sách không thành công.',
+      users.rows.length > 0 ? 'Lấy danh sách thành công.' : 'Không có dữ liệu.',
+    totalPage,
     users,
   });
 });

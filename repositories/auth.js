@@ -24,12 +24,11 @@ const findByIdAsync = asyncHandler(async (userId) => {
 });
 
 // ham lay danh sach user
-const getAllUserAsync = asyncHandler(async (query) => {
-  const users = await db.User.findAll({
+const getAllUserAsync = asyncHandler(async (query, options) => {
+  const users = await db.User.findAndCountAll({
     where: query,
-    attributes: {
-      exclude: ['password'],
-    },
+    order: [['createdAt', 'DESC']],
+    ...options,
   });
   return users;
 });

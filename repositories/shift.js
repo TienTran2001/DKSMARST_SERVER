@@ -4,13 +4,18 @@ const dotenv = require('dotenv');
 dotenv.config();
 const jwt = require('jsonwebtoken');
 
-const getAllShiftAsync = asyncHandler(async (query) => {
-  return await db.Shift.findAll({
+const getAllShiftAsync = asyncHandler(async (query, options) => {
+  return await db.Shift.findAndCountAll({
     where: query,
     order: [['registration_date', 'DESC']],
+    ...options,
     include: [
-      { model: db.ShiftDetail, attributes: ['maxQuantity', 'quantity'] },
+      {
+        model: db.ShiftDetail,
+        attributes: ['maxQuantity', 'quantity'],
+      },
     ],
+    distinct: true,
   });
 });
 
