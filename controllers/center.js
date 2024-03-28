@@ -8,7 +8,7 @@ const db = require('../models');
 //lay danh sach trung tam
 
 const getAllCenter = asyncHandler(async (req, res) => {
-  const { limit, page, name, ...query } = req.query;
+  const { limit, page, name, province, ...query } = req.query;
   const options = {};
   if (!limit) {
     // filter
@@ -16,6 +16,9 @@ const getAllCenter = asyncHandler(async (req, res) => {
       query.name = {
         [Op.substring]: name,
       };
+    }
+    if (province) {
+      query.provinceId = province;
     }
     const centers = await centerRepository.getAllCenterAsync(query);
 

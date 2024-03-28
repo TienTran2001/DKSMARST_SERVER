@@ -9,6 +9,20 @@ const db = require('../models');
 const getAllShift = asyncHandler(async (req, res) => {
   const { limit, page, date, ...query } = req.query;
   const { centerId } = req.params;
+  query.centerId = centerId;
+  if (!limit) {
+    console.log('vap');
+    const shifts = await shiftRepository.getShiftsAfterOrEqualToTodayAsync(
+      query
+    );
+    return res.json({
+      success: shifts.length >= 0 ? true : false,
+      message:
+        shifts.length > 0 ? 'Lấy danh sách thành công.' : 'Không có dữ liệu.',
+      shifts,
+    });
+  }
+
   const options = {};
   // filter
   if (date) {
@@ -22,8 +36,6 @@ const getAllShift = asyncHandler(async (req, res) => {
 
   if (offset) options.offset = offset;
   options.limit = +limit;
-
-  query.centerId = centerId;
 
   const shifts = await shiftRepository.getAllShiftAsync(query, options);
   let totalPage = 0;

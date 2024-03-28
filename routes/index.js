@@ -9,6 +9,7 @@ const center = require('./center');
 const vehicle = require('./vehicle');
 const dotenv = require('dotenv');
 const shift = require('./shift');
+const appointment = require('./appointment');
 dotenv.config();
 
 const initRoutes = (app) => {
@@ -18,6 +19,7 @@ const initRoutes = (app) => {
   app.use(`/api/v1/centers`, center);
   app.use(`/api/v1/vehicles`, vehicle);
   app.use(`/api/v1/center`, shift);
+  app.use(`/api/v1/appointments`, appointment);
 
   app.use(badRequestException);
   app.use(errHandler);

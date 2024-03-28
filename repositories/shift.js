@@ -3,6 +3,27 @@ const db = require('../models');
 const dotenv = require('dotenv');
 dotenv.config();
 const jwt = require('jsonwebtoken');
+const { Op } = require('sequelize');
+
+const getShiftsAfterOrEqualToTodayAsync = async (query) => {
+  const shifts = await db.Shift.findAll({
+    where: {
+      ...query,
+      registrationDate: {
+        [Op.gte]: new Date(), // Lấy các lịch hẹn có ngày đăng ký lớn hơn hoặc bằng ngày hiện tại
+      },
+    },
+
+    include: [
+      {
+        model: db.ShiftDetail,
+        attributes: ['maxQuantity', 'quantity'],
+      },
+    ],
+  });
+
+  return shifts;
+};
 
 const getAllShiftAsync = asyncHandler(async (query, options) => {
   return await db.Shift.findAndCountAll({
@@ -82,4 +103,5 @@ module.exports = {
   getShiftDetailAsync,
   deleteShiftDetailAsync,
   updateShiftDetailAsync,
+  getShiftsAfterOrEqualToTodayAsync,
 };

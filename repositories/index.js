@@ -3,6 +3,7 @@ const provinceRepository = require('./province');
 const centerRepository = require('./center');
 const vehicleRepository = require('./vehicle');
 const shiftRepository = require('./shift');
+const appointmentRepository = require('./appointment');
 
 module.exports = {
   authRepository,
@@ -10,4 +11,5 @@ module.exports = {
   centerRepository,
   vehicleRepository,
   shiftRepository,
+  appointmentRepository,
 };
