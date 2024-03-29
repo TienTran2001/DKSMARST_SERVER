@@ -10,13 +10,14 @@ const {
 } = require('../middlewares/verifyToken');
 
 router.get('', verifyToken, controllers.getAllAppointmentOfUser);
+router.get('/:appointmentId', verifyToken, controllers.getAppointment);
 router.post(
   '',
   verifyToken,
   validateDTO(
     Joi.object({
       appointmentDate: stringReq,
-      note: stringReq,
+      note: string,
       shiftDetailId: numberReq,
       vehicleId: numberReq,
       centerId: numberReq,

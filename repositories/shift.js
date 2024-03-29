@@ -84,6 +84,25 @@ const updateShiftDetailAsync = asyncHandler(async (req, shiftDetailId) => {
   return response;
 });
 
+const incrementQuantity = asyncHandler(async (shiftDetailId) => {
+  const shiftDetail = await db.ShiftDetail.findByPk(shiftDetailId);
+
+  // Tăng số lượng quantity lên 1 nếu nó nhỏ hơn hoặc bằng maxQuantity
+  if (shiftDetail.quantity < shiftDetail.maxQuantity) {
+    shiftDetail.quantity += 1;
+    if (shiftDetail.quantity == shiftDetail.maxQuantity) {
+      shiftDetail.status = 'đã đầy';
+    }
+    await shiftDetail.save();
+  } else {
+    // Trường hợp quantity đã đạt maxQuantity, trả về null hoặc thông báo lỗi tùy ý
+    return null;
+  }
+
+  // Trả về chi tiết ca làm việc sau khi tăng quantity thành công
+  return shiftDetail;
+});
+
 // delete
 const deleteShiftAsync = asyncHandler(async (query) => {
   return await db.Shift.destroy({ where: query });
@@ -104,4 +123,5 @@ module.exports = {
   deleteShiftDetailAsync,
   updateShiftDetailAsync,
   getShiftsAfterOrEqualToTodayAsync,
+  incrementQuantity,
 };

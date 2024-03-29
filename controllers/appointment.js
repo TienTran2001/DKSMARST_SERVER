@@ -1,9 +1,10 @@
 const asyncHandler = require('express-async-handler');
 const statusCode = require('../utils/statusCode');
 const db = require('../models');
-const { appointmentRepository } = require('../repositories');
+const { appointmentRepository, shiftRepository } = require('../repositories');
 const { throwErrorWithStatus } = require('../middlewares/errorHandler');
 const { Op } = require('sequelize');
+const { addShiftDetail } = require('./shift');
 
 // lấy thông tin user theo id
 // const getById = asyncHandler(async (req, res) => {
@@ -39,7 +40,8 @@ const getAllAppointmentOfUser = asyncHandler(async (req, res) => {
 
   if (offset) options.offset = offset;
   options.limit = +limit;
-  console.log(options);
+  console.log(query);
+
   const appointments = await appointmentRepository.getAllAppointmentAsync(
     query,
     keyword,
@@ -51,7 +53,7 @@ const getAllAppointmentOfUser = asyncHandler(async (req, res) => {
     totalPage = Math.ceil(appointments.count / limit);
   }
   return res.json({
-    success: appointments.rows.length > 0 ? true : false,
+    success: appointments.rows.length >= 0 ? true : false,
     message:
       appointments.rows.length > 0
         ? 'Lấy danh sách thành công.'
@@ -60,10 +62,23 @@ const getAllAppointmentOfUser = asyncHandler(async (req, res) => {
     appointments,
   });
 });
+//lay lịch hẹn theo id
+const getAppointment = asyncHandler(async (req, res) => {
+  const { appointmentId } = req.params;
+  const appointment = await appointmentRepository.findAppointmentAsync({
+    appointmentId,
+  });
+
+  return res.json({
+    success: appointment ? true : false,
+    message: appointment ? 'Lấy danh sách thành công.' : 'Không có dữ liệu.',
+    appointment,
+  });
+});
 
 // thêm lịch hẹn
 const addAppointment = asyncHandler(async (req, res, next) => {
-  const { vehicleId } = req.body;
+  const { vehicleId, shiftDetailId } = req.body;
   const { userId } = req.user;
   req.body.userId = userId;
   console.log(req.body);
@@ -83,10 +98,28 @@ const addAppointment = asyncHandler(async (req, res, next) => {
       res,
       next
     );
+  const shiftDetail = await shiftRepository.getShiftDetailAsync({
+    shiftDetailId,
+  });
+  console.log(shiftDetail);
+  if (
+    shiftDetail?.status == 'Đã đầy' ||
+    shiftDetail?.status == 'Ngưng nhận lịch'
+  ) {
+    return throwErrorWithStatus(
+      statusCode.BAD_REQUEST,
+      'Ca không nhận lịch.',
+      res,
+      next
+    );
+  }
 
   const newAppointment = await appointmentRepository.addAppointmentAsync(
     req.body
   );
+  if (newAppointment) {
+    await shiftRepository.incrementQuantity(shiftDetailId);
+  }
   return res.json({
     success: newAppointment ? true : false,
     message: newAppointment
@@ -183,4 +216,5 @@ const addAppointment = asyncHandler(async (req, res, next) => {
 module.exports = {
   getAllAppointmentOfUser,
   addAppointment,
+  getAppointment,
 };

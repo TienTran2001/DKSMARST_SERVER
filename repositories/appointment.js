@@ -10,8 +10,22 @@ const findAppointmentAsync = asyncHandler(async (query) => {
     where: query,
     include: [
       {
+        model: db.Center,
+        attributes: ['name', 'address'],
+      },
+      {
         model: db.Vehicle,
         attributes: ['licensePlate', 'plateColor', 'vehicleType'],
+        // where: keyword,
+      },
+      {
+        model: db.ShiftDetail,
+        // where: keyword,
+      },
+      {
+        model: db.User,
+        attributes: ['fullname', 'phone'],
+        // where: keyword,
       },
     ],
   });
@@ -24,9 +38,17 @@ const getAllAppointmentAsync = asyncHandler(async (query, keyword, options) => {
     order: [['createdAt', 'DESC']],
     include: [
       {
+        model: db.Center,
+        attributes: ['name', 'address'],
+      },
+      {
         model: db.Vehicle,
         attributes: ['licensePlate', 'plateColor', 'vehicleType'],
-        where: keyword,
+        // where: keyword,
+      },
+      {
+        model: db.ShiftDetail,
+        // where: keyword,
       },
     ],
     ...options,

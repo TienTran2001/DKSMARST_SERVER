@@ -131,7 +131,7 @@ const addShift = asyncHandler(async (req, res, next) => {
       },
       {
         startTime: '15:00',
-        endTime: '15:30',
+        endTime: '6:00',
         quantity: 0,
         maxQuantity: 10,
         status: 1,
