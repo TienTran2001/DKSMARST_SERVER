@@ -135,3 +135,31 @@ CREATE TABLE appointments (
 );
 
 
+
+-- trigger xóa vehicle thì update vehicleId trong bảng appointment về null
+DELIMITER //
+
+CREATE TRIGGER update_appointments_vehicle_id
+BEFORE DELETE ON vehicles
+FOR EACH ROW
+BEGIN
+    UPDATE appointments SET vehicle_id = NULL WHERE vehicle_id = OLD.vehicle_id;
+END;
+//
+
+DELIMITER ;
+
+-- -- Cập nhật id của shift_detail trong bảng appointments về null khi xóa ca   
+DELIMITER //
+
+CREATE TRIGGER update_appointments_shift_detail_id
+BEFORE DELETE ON shift_details
+FOR EACH ROW
+BEGIN
+    UPDATE appointments SET shift_detail_id = NULL WHERE shift_detail_id = OLD.shift_detail_id;
+END;
+//
+
+DELIMITER ;
+
+

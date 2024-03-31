@@ -15,7 +15,7 @@ const findAppointmentAsync = asyncHandler(async (query) => {
       },
       {
         model: db.Vehicle,
-        attributes: ['licensePlate', 'plateColor', 'vehicleType'],
+        // attributes: ['licensePlate', 'plateColor', 'vehicleType'],
         // where: keyword,
       },
       {
@@ -50,6 +50,11 @@ const getAllAppointmentAsync = asyncHandler(async (query, keyword, options) => {
         model: db.ShiftDetail,
         // where: keyword,
       },
+      {
+        model: db.User,
+        attributes: ['fullname', 'phone'],
+        // where: keyword,
+      },
     ],
     ...options,
   });
@@ -61,11 +66,13 @@ const addAppointmentAsync = asyncHandler(async (data) => {
   return await db.Appointment.create(data);
 });
 
-// ham update user
-// const updateUserAsync = asyncHandler(async (req, userId) => {
-//   const response = await db.User.update(req.body, { where: { userId } });
-//   return response;
-// });
+// ham update trạng thái
+const updateStatusAsync = asyncHandler(async (data, appointmentId) => {
+  const response = await db.Appointment.update(data, {
+    where: { appointmentId },
+  });
+  return response;
+});
 
 // // hàm xóa user
 // const deleteUserAsync = asyncHandler(async (userId) => {
@@ -90,4 +97,5 @@ module.exports = {
   getAllAppointmentAsync,
   findAppointmentAsync,
   addAppointmentAsync,
+  updateStatusAsync,
 };

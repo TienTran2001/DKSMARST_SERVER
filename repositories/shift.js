@@ -99,7 +99,23 @@ const incrementQuantity = asyncHandler(async (shiftDetailId) => {
     return null;
   }
 
-  // Trả về chi tiết ca làm việc sau khi tăng quantity thành công
+  return shiftDetail;
+});
+const decrementQuantity = asyncHandler(async (shiftDetailId) => {
+  const shiftDetail = await db.ShiftDetail.findByPk(shiftDetailId);
+
+  // Kiểm tra nếu quantity đã bằng 0
+  if (shiftDetail.quantity === 0) {
+    // Trả về null hoặc thông báo lỗi tùy ý
+    return null;
+  }
+
+  // Giảm số lượng quantity đi 1
+  shiftDetail.quantity -= 1;
+
+  // Lưu thay đổi vào cơ sở dữ liệu
+  await shiftDetail.save();
+
   return shiftDetail;
 });
 
@@ -124,4 +140,5 @@ module.exports = {
   updateShiftDetailAsync,
   getShiftsAfterOrEqualToTodayAsync,
   incrementQuantity,
+  decrementQuantity,
 };

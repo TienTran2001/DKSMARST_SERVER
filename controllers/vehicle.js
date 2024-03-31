@@ -1,9 +1,10 @@
 const asyncHandler = require('express-async-handler');
 const statusCode = require('../utils/statusCode');
-const { vehicleRepository } = require('../repositories');
+const { vehicleRepository, appointmentRepository } = require('../repositories');
 const { Op } = require('sequelize');
 const { throwErrorWithStatus } = require('../middlewares/errorHandler');
 const db = require('../models');
+const appointment = require('../models/appointment');
 
 //lay danh phuong tien
 const getAllVehicle = asyncHandler(async (req, res) => {
@@ -21,7 +22,7 @@ const getAllVehicle = asyncHandler(async (req, res) => {
   const vehicles = await vehicleRepository.getAllVehicleAsync(query);
 
   return res.json({
-    success: vehicles.length > 0 ? true : false,
+    success: vehicles.length >= 0 ? true : false,
     message: vehicles
       ? 'Lấy danh sách thành công.'
       : 'Lấy danh sách không thành công.',
@@ -118,6 +119,7 @@ const deleteVehicle = asyncHandler(async (req, res, next) => {
     userId,
     vehicleId,
   });
+
   return res.json({
     success: response ? true : false,
     message: response

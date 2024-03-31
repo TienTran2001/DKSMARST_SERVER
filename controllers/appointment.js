@@ -1,7 +1,11 @@
 const asyncHandler = require('express-async-handler');
 const statusCode = require('../utils/statusCode');
 const db = require('../models');
-const { appointmentRepository, shiftRepository } = require('../repositories');
+const {
+  appointmentRepository,
+  shiftRepository,
+  authRepository,
+} = require('../repositories');
 const { throwErrorWithStatus } = require('../middlewares/errorHandler');
 const { Op } = require('sequelize');
 const { addShiftDetail } = require('./shift');
@@ -41,6 +45,52 @@ const getAllAppointmentOfUser = asyncHandler(async (req, res) => {
   if (offset) options.offset = offset;
   options.limit = +limit;
   console.log(query);
+
+  const appointments = await appointmentRepository.getAllAppointmentAsync(
+    query,
+    keyword,
+    options
+  );
+
+  let totalPage = 0;
+  if (appointments.rows.length > 0) {
+    totalPage = Math.ceil(appointments.count / limit);
+  }
+  return res.json({
+    success: appointments.rows.length >= 0 ? true : false,
+    message:
+      appointments.rows.length > 0
+        ? 'Lấy danh sách thành công.'
+        : 'Không có dữ liệu.',
+    totalPage,
+    appointments,
+  });
+});
+//lay danh sach lich hen theo trung tâm
+const getAllAppointmentOfCenter = asyncHandler(async (req, res) => {
+  const { limit, page, search, status, ...query } = req.query;
+  const { userId } = req.user;
+  const user = await authRepository.findByIdAsync(userId);
+  console.log(user.centerId);
+  query.centerId = user.centerId;
+  const keyword = {};
+  const options = {};
+  // console.log({ search, limit, page });
+  // filter
+  if (search) {
+    query.appointmentDate = {
+      [Op.substring]: search,
+    };
+  }
+  // filter theo status
+  if (status) query.status = status;
+
+  const prevPage = page - 1 >= 0 ? +page + 1 : 1;
+  const offset = (prevPage - 1) * limit;
+
+  if (offset) options.offset = offset;
+  options.limit = +limit;
+  // console.log(query);
 
   const appointments = await appointmentRepository.getAllAppointmentAsync(
     query,
@@ -129,36 +179,54 @@ const addAppointment = asyncHandler(async (req, res, next) => {
   });
 });
 
-// // Sua tai khoan
-// const updateUser = asyncHandler(async (req, res, next) => {
-//   const { userId } = req.params;
-//   const { email } = req.body;
-//   const existUser = await authRepository.findByIdAsync(userId);
-//   if (!existUser)
-//     return throwErrorWithStatus(
-//       statusCode.NOTFOUND,
-//       'Tài khoản không tồn tại.',
-//       res,
-//       next
-//     );
-//   const existEmail = await authRepository.findByEmailAsync(email);
+// Update trạng thái
+const updateStatus = asyncHandler(async (req, res, next) => {
+  const { appointmentId } = req.params;
+  const appointment = await appointmentRepository.findAppointmentAsync({
+    appointmentId,
+  });
+  const data = {};
+  if (appointment?.status == 'chưa xác nhận') {
+    data.status = 'đã xác nhận';
+  }
+  if (appointment?.status == 'đã xác nhận') {
+    data.status = 'đã hoàn thành';
+  }
+  const response = await appointmentRepository.updateStatusAsync(
+    data,
+    appointmentId
+  );
 
-//   if (existEmail && email !== existUser.email)
-//     return throwErrorWithStatus(
-//       statusCode.UNAUTHORIZED,
-//       'Email đã tồn tại.',
-//       res,
-//       next
-//     );
+  return res.json({
+    success: response ? true : false,
+    message: response
+      ? 'Cập nhật trạng thái thành công.'
+      : 'Cập nhật trạng thái thất bại.',
+  });
+});
 
-//   const response = await authRepository.updateUserAsync(req, userId);
-//   return res.json({
-//     success: response ? true : false,
-//     message: response
-//       ? 'Cập nhật tài khoản thành công.'
-//       : 'Cập nhật khoản không thành công.',
-//   });
-// });
+const cancelAppointment = asyncHandler(async (req, res, next) => {
+  const { appointmentId } = req.params;
+
+  const data = {};
+  data.status = 'đã hủy';
+
+  const response = await appointmentRepository.updateStatusAsync(
+    data,
+    appointmentId
+  );
+
+  if (response) {
+    await shiftRepository.decrementQuantity(shiftDetailId);
+  }
+
+  return res.json({
+    success: response ? true : false,
+    message: response
+      ? 'Hủy lịch hẹn thành công.'
+      : 'Hủy lịch hẹn thất bại thất bại.',
+  });
+});
 
 // // Sua tai khoan
 // const updateCurrent = asyncHandler(async (req, res, next) => {
@@ -215,6 +283,9 @@ const addAppointment = asyncHandler(async (req, res, next) => {
 
 module.exports = {
   getAllAppointmentOfUser,
+  getAllAppointmentOfCenter,
   addAppointment,
   getAppointment,
+  updateStatus,
+  cancelAppointment,
 };

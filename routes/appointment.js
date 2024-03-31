@@ -10,6 +10,12 @@ const {
 } = require('../middlewares/verifyToken');
 
 router.get('', verifyToken, controllers.getAllAppointmentOfUser);
+router.get(
+  '/center',
+  verifyToken,
+  isCenter,
+  controllers.getAllAppointmentOfCenter
+);
 router.get('/:appointmentId', verifyToken, controllers.getAppointment);
 router.post(
   '',
@@ -26,45 +32,12 @@ router.post(
   controllers.addAppointment
 );
 
-// router.post(
-//   '/shift-details/:shiftId',
-//   verifyToken,
-//   isCenter,
-//   validateDTO(
-//     Joi.object({
-//       startTime: stringReq,
-//       endTime: stringReq,
-//       maxQuantity: numberReq,
-//       status: numberReq,
-//     })
-//   ),
-//   controllers.addShiftDetail
-// );
-// router.put(
-//   '/shifts/:shiftId',
-//   verifyToken,
-//   isCenter,
-//   validateDTO(
-//     Joi.object({
-//       registrationDate: stringReq,
-//     })
-//   ),
-//   controllers.updateShift
-// );
-// router.put(
-//   '/shift-details/:shiftDetailId',
-//   verifyToken,
-//   isCenter,
-//   validateDTO(
-//     Joi.object({
-//       startTime: stringReq,
-//       endTime: stringReq,
-//       maxQuantity: numberReq,
-//       status: numberReq,
-//     })
-//   ),
-//   controllers.updateShiftDetail
-// );
+router.put('/:appointmentId', verifyToken, isCenter, controllers.updateStatus);
+router.put(
+  '/cancel/:appointmentId',
+  verifyToken,
+  controllers.cancelAppointment
+);
 
 // router.delete(
 //   '/shifts/:shiftId',

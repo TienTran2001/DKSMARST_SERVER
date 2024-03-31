@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       shiftDetailId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         field: 'shift_detail_id',
         references: {
           model: 'shift_details',
