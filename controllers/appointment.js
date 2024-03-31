@@ -210,6 +210,9 @@ const cancelAppointment = asyncHandler(async (req, res, next) => {
 
   const data = {};
   data.status = 'đã hủy';
+  const appointment = await appointmentRepository.findAppointmentAsync({
+    appointmentId,
+  });
 
   const response = await appointmentRepository.updateStatusAsync(
     data,
@@ -217,7 +220,7 @@ const cancelAppointment = asyncHandler(async (req, res, next) => {
   );
 
   if (response) {
-    await shiftRepository.decrementQuantity(shiftDetailId);
+    await shiftRepository.decrementQuantity(appointment.shiftDetailId);
   }
 
   return res.json({

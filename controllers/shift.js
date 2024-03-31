@@ -90,6 +90,7 @@ const addShift = asyncHandler(async (req, res, next) => {
 
   const existShift = await shiftRepository.getShiftAsync({
     registrationDate,
+    centerId: user.centerId,
   });
 
   if (existShift)
