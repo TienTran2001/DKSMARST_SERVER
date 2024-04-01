@@ -9,6 +9,7 @@ const {
   isCenter,
 } = require('../middlewares/verifyToken');
 
+router.post('/send-mail', verifyToken, controllers.send);
 router.get('', verifyToken, controllers.getAllAppointmentOfUser);
 router.get(
   '/center',

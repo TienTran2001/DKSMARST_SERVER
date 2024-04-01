@@ -9,6 +9,7 @@ const {
 const { throwErrorWithStatus } = require('../middlewares/errorHandler');
 const { Op } = require('sequelize');
 const { addShiftDetail } = require('./shift');
+const { sendEmail } = require('../services/emailService');
 
 // lấy thông tin user theo id
 // const getById = asyncHandler(async (req, res) => {
@@ -197,11 +198,20 @@ const updateStatus = asyncHandler(async (req, res, next) => {
     appointmentId
   );
 
-  return res.json({
+  return res.status(200).json({
     success: response ? true : false,
-    message: response
-      ? 'Cập nhật trạng thái thành công.'
-      : 'Cập nhật trạng thái thất bại.',
+    message: response ? `Lịch hẹn ${data.status}` : 'Đổi trạng thái thất bại',
+  });
+});
+
+const send = asyncHandler(async (req, res) => {
+  const { email, subject, message } = req.body;
+
+  console.log(email);
+  await sendEmail(email, subject, message);
+  return res.json({
+    success: true,
+    message: 'Thành công',
   });
 });
 
@@ -231,59 +241,6 @@ const cancelAppointment = asyncHandler(async (req, res, next) => {
   });
 });
 
-// // Sua tai khoan
-// const updateCurrent = asyncHandler(async (req, res, next) => {
-//   const { userId } = req.user;
-//   const { email } = req.body;
-//   const existUser = await authRepository.findByIdAsync(userId);
-//   if (!existUser)
-//     return throwErrorWithStatus(
-//       statusCode.NOTFOUND,
-//       'Tài khoản không tồn tại.',
-//       res,
-//       next
-//     );
-//   const existEmail = await authRepository.findByEmailAsync(email);
-
-//   if (existEmail && email !== existUser.email)
-//     return throwErrorWithStatus(
-//       statusCode.UNAUTHORIZED,
-//       'Email đã tồn tại.',
-//       res,
-//       next
-//     );
-
-//   const response = await authRepository.updateUserAsync(req, userId);
-//   return res.json({
-//     success: response ? true : false,
-//     message: response
-//       ? 'Cập nhật tài khoản thành công.'
-//       : 'Cập nhật khoản không thành công.',
-//   });
-// });
-
-// // xoa tai khoan
-// const deleteUser = asyncHandler(async (req, res, next) => {
-//   const { userId } = req.params;
-
-//   const existUser = await authRepository.findByIdAsync(userId);
-//   if (!existUser)
-//     return throwErrorWithStatus(
-//       statusCode.NOTFOUND,
-//       'Tài khoản không tồn tại.',
-//       res,
-//       next
-//     );
-
-//   const response = await authRepository.deleteUserAsync(userId);
-//   return res.json({
-//     success: response ? true : false,
-//     message: response
-//       ? 'Xóa tài khoản thành công.'
-//       : 'Xóa khoản không thành công.',
-//   });
-// });
-
 module.exports = {
   getAllAppointmentOfUser,
   getAllAppointmentOfCenter,
@@ -291,4 +248,5 @@ module.exports = {
   getAppointment,
   updateStatus,
   cancelAppointment,
+  send,
 };

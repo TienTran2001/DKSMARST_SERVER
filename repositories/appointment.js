@@ -24,7 +24,7 @@ const findAppointmentAsync = asyncHandler(async (query) => {
       },
       {
         model: db.User,
-        attributes: ['fullname', 'phone'],
+        attributes: ['fullname', 'phone', 'email'],
         // where: keyword,
       },
     ],
