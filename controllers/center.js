@@ -9,23 +9,26 @@ const db = require('../models');
 
 const getAllCenter = asyncHandler(async (req, res) => {
   const { limit, page, name, province, ...query } = req.query;
+
   const options = {};
+
+  if (name) {
+    query.name = {
+      [Op.substring]: name,
+    };
+  }
+  if (province) {
+    query.provinceId = province;
+  }
   if (!limit) {
     // filter
-    if (name) {
-      query.name = {
-        [Op.substring]: name,
-      };
-    }
-    if (province) {
-      query.provinceId = province;
-    }
+
     const centers = await centerRepository.getAllCenterAsync(query);
 
     return res.json({
-      success: centers.length > 0 ? true : false,
+      success: centers?.length >= 0 ? true : false,
       message:
-        centers.length > 0
+        centers?.length >= 0
           ? 'Lấy danh sách thành công.'
           : 'Lấy danh sách không thành công.',
       centers,
@@ -42,13 +45,19 @@ const getAllCenter = asyncHandler(async (req, res) => {
     where: query,
     ...options,
     include: [{ model: db.Province, attributes: ['name'] }],
+    order: [['createdAt', 'DESC']],
   });
+  let totalPage = 0;
+  if (centers.rows.length > 0) {
+    totalPage = Math.ceil(centers.count / limit);
+  }
   return res.json({
-    success: centers.count > 0 ? true : false,
+    success: centers.count >= 0 ? true : false,
     message:
-      centers.count > 0
+      centers.count >= 0
         ? 'Lấy danh sách thành công.'
         : 'Lấy danh sách không thành công.',
+    totalPage,
     centers,
   });
 });
