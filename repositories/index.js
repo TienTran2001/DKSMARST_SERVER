@@ -4,6 +4,7 @@ const centerRepository = require('./center');
 const vehicleRepository = require('./vehicle');
 const shiftRepository = require('./shift');
 const appointmentRepository = require('./appointment');
+const newsRepository = require('./news');
 
 module.exports = {
   authRepository,
@@ -12,4 +13,5 @@ module.exports = {
   vehicleRepository,
   shiftRepository,
   appointmentRepository,
+  newsRepository,
 };
