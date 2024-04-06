@@ -54,6 +54,7 @@ const addVehicle = asyncHandler(async (req, res, next) => {
 
   const existVehicle = await vehicleRepository.getVehicleAsync({
     licensePlate,
+    userId,
   });
 
   if (existVehicle)
