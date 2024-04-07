@@ -16,7 +16,7 @@ const findUserById = asyncHandler(async (req, res) => {
 const register = asyncHandler(async (req, res, next) => {
   // phone, email, fullname, password, address, roleId
   const { phone, email } = req.body;
-  req.body.roleId = 3;
+  req.body.roleId = 2;
   console.log(req.body);
   const existPhone = await authRepository.findByPhoneAsync(phone);
   if (existPhone)
