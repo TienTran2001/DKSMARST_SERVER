@@ -2,9 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const dbConnect = require('./config/dbConnect.js');
 const dotenv = require('dotenv');
-dotenv.config('cổng: ', process.env.PORT);
+dotenv.config();
 const initRoutes = require('./routes');
-console.log();
+console.log('cổng: ', process.env.PORT);
 const app = express();
 app.use(
   cors({
