@@ -10,7 +10,7 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.js')[env];
 const dotenv = require('dotenv');
 dotenv.config();
-console.log('cổng: ', process.env.PORT);
+console.log('cổng: ', process.env.DB_USERNAME);
 const db = {};
 
 let sequelize;
