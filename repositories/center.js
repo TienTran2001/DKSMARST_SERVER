@@ -19,7 +19,9 @@ const getCenterByNameAsync = asyncHandler(async (name) => {
 
 // lấy theo id
 const getCenterById = asyncHandler(async (centerId) => {
-  return await db.Center.findByPk(centerId);
+  return await db.Center.findByPk(centerId, {
+    include: [{ model: db.Province, attributes: ['name'] }],
+  });
 });
 
 // thêm trung tâm
