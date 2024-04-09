@@ -28,4 +28,4 @@ app.listen(PORT, () => {
 setInterval(async () => {
   console.log('Nhắc đi đăng kiểm');
   await scheduleJob();
-}, 86400000 * 5);
+}, 86400000 * 2);
