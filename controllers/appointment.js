@@ -168,15 +168,19 @@ const addAppointment = asyncHandler(async (req, res, next) => {
   const newAppointment = await appointmentRepository.addAppointmentAsync(
     req.body
   );
+  let appointment;
   if (newAppointment) {
     await shiftRepository.incrementQuantity(shiftDetailId);
+    appointment = await appointmentRepository.findAppointmentAsync({
+      appointmentId: newAppointment.appointmentId,
+    });
   }
   return res.json({
     success: newAppointment ? true : false,
     message: newAppointment
       ? 'Đặt lịch hẹn thành công.'
       : 'Đặt lịch hẹn không thành công.',
-    newAppointment,
+    appointment,
   });
 });
 
