@@ -9,7 +9,7 @@ module.exports = {
     port: process.env.DB_PORT,
     dialect: process.env.DB_DIALECT,
     logging: false,
-    timezone: '+7:00',
+    timezone: '+07:00',
   },
 };
 
