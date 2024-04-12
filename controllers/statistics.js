@@ -60,8 +60,10 @@ const getStatisticsUsers = asyncHandler(async (req, res) => {
   if (newUsersYesterday === 0) {
     percentageIncrease = newUsers > 0 ? 100 : 0;
   } else {
-    percentageIncrease =
-      ((newUsers - newUsersYesterday) / newUsersYesterday) * 100;
+    percentageIncrease = (
+      ((newUsers - newUsersYesterday) / newUsersYesterday) *
+      100
+    ).toFixed(2);
   }
 
   return res.json({
@@ -123,10 +125,11 @@ const getStatisticsAppointments = asyncHandler(async (req, res) => {
   if (newAppointmentsYesterday === 0) {
     percentageIncrease = newAppointments > 0 ? 100 : 0;
   } else {
-    percentageIncrease =
+    percentageIncrease = (
       ((newAppointments - newAppointmentsYesterday) /
         newAppointmentsYesterday) *
-      100;
+      100
+    ).toFixed(2);
   }
 
   const doneAppointments = await db.Appointment.count({
