@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const statusCode = require('../utils/statusCode');
 const db = require('../models');
+const { Op } = require('sequelize');
 const { provinceRepository } = require('../repositories');
 const { throwErrorWithStatus } = require('../middlewares/errorHandler');
 
@@ -19,13 +20,52 @@ const getProvinceById = asyncHandler(async (req, res) => {
 
 // lấy danh sách tỉnh thành
 const getAllProvince = asyncHandler(async (req, res) => {
-  const response = await provinceRepository.getAllProvinceAsync();
+  const { limit, page, name, ...query } = req.query;
+
+  const options = {};
+
+  if (name) {
+    query.name = {
+      [Op.substring]: name,
+    };
+  }
+
+  if (!limit) {
+    // filter
+
+    const response = await provinceRepository.getAllProvinceAsync();
+    return res.json({
+      success: response ? true : false,
+      message: response
+        ? 'Lấy danh sách tỉnh thành thành công.'
+        : 'Lấy danh sách tỉnh thành thất bại.',
+      provinces: response,
+    });
+  }
+
+  const prevPage = page - 1 >= 0 ? +page + 1 : 1;
+  const offset = (prevPage - 1) * limit;
+
+  if (offset) options.offset = offset;
+  options.limit = +limit;
+
+  const provinces = await db.Province.findAndCountAll({
+    where: query,
+    ...options,
+    order: [['createdAt', 'DESC']],
+  });
+  let totalPage = 0;
+  if (provinces.rows.length > 0) {
+    totalPage = Math.ceil(provinces.count / limit);
+  }
   return res.json({
-    success: response ? true : false,
-    message: response
-      ? 'Lấy danh sách tỉnh thành thành công.'
-      : 'Lấy danh sách tỉnh thành thất bại.',
-    provinces: response,
+    success: provinces.count >= 0 ? true : false,
+    message:
+      provinces.count >= 0
+        ? 'Lấy danh sách thành công.'
+        : 'Lấy danh sách không thành công.',
+    totalPage,
+    provinces,
   });
 });
 

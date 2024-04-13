@@ -36,9 +36,20 @@ const isCenter = async (req, res, next) => {
   }
   next();
 };
+const isStaffOfCenter = async (req, res, next) => {
+  const { roleId } = req.user;
+
+  const role = await db.Role.findByPk(roleId);
+
+  if (role?.roleName !== 'center' && role?.roleName !== 'staff') {
+    return throwErrorWithStatus(401, 'Bạn không có quyền truy cập', res, next);
+  }
+  next();
+};
 
 module.exports = {
   verifyToken,
   isAdmin,
   isCenter,
+  isStaffOfCenter,
 };

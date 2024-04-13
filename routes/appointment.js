@@ -7,6 +7,7 @@ const {
   verifyToken,
   isAdmin,
   isCenter,
+  isStaffOfCenter,
 } = require('../middlewares/verifyToken');
 
 router.post('/send-mail', verifyToken, controllers.send);
@@ -14,7 +15,7 @@ router.get('', verifyToken, controllers.getAllAppointmentOfUser);
 router.get(
   '/center',
   verifyToken,
-  isCenter,
+  isStaffOfCenter,
   controllers.getAllAppointmentOfCenter
 );
 router.get('/:appointmentId', verifyToken, controllers.getAppointment);
@@ -33,7 +34,12 @@ router.post(
   controllers.addAppointment
 );
 
-router.put('/:appointmentId', verifyToken, isCenter, controllers.updateStatus);
+router.put(
+  '/:appointmentId',
+  verifyToken,
+  isStaffOfCenter,
+  controllers.updateStatus
+);
 router.put(
   '/cancel/:appointmentId',
   verifyToken,
