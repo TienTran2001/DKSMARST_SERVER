@@ -6,6 +6,7 @@ const {
   verifyToken,
   isAdmin,
   isCenter,
+  isAllOfCenter,
 } = require('../middlewares/verifyToken');
 
 router.get('/centers', verifyToken, isAdmin, controllers.getStatisticsCenters);
@@ -13,8 +14,14 @@ router.get('/users', verifyToken, isAdmin, controllers.getStatisticsUsers);
 router.get(
   '/appointments',
   verifyToken,
-  isCenter,
+  isAllOfCenter,
   controllers.getStatisticsAppointments
+);
+router.get(
+  '/appointments-of-month',
+  verifyToken,
+  isAllOfCenter,
+  controllers.getStatisticsAppointmentsYearAndMonth
 );
 
 module.exports = router;

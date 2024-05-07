@@ -7,48 +7,27 @@ const db = require('../models');
 
 //lay danh ngay dang kiem
 const getAllShift = asyncHandler(async (req, res) => {
-  const { limit, page, date, ...query } = req.query;
-  const { centerId } = req.params;
-  query.centerId = centerId;
-  if (!limit) {
-    console.log('vap');
-    const shifts = await shiftRepository.getShiftsAfterOrEqualToTodayAsync(
-      query
-    );
-    return res.json({
-      success: shifts.length >= 0 ? true : false,
-      message:
-        shifts.length > 0 ? 'Lấy danh sách thành công.' : 'Không có dữ liệu.',
-      shifts,
-    });
+  const { ...query } = req.query;
+  const { userId } = req.user;
+  const user = await authRepository.findByIdAsync(userId);
+  if (user) {
+    query.centerId = user.centerId;
   }
 
   const options = {};
-  // filter
-  if (date) {
-    query.registrationDate = {
-      [Op.substring]: date,
-    };
-  }
 
-  const prevPage = page - 1 >= 0 ? +page + 1 : 1;
-  const offset = (prevPage - 1) * limit;
+  // const shifts = await shiftRepository.getAllShiftAsync(query, options);
+  const shifts = await db.Shift.findAndCountAll({
+    where: query,
+    // distinct: true,
+  });
 
-  if (offset) options.offset = offset;
-  options.limit = +limit;
-
-  const shifts = await shiftRepository.getAllShiftAsync(query, options);
-  let totalPage = 0;
-  if (shifts.rows.length > 0) {
-    totalPage = Math.ceil(shifts.count / limit);
-  }
   return res.json({
     success: shifts.rows.length > 0 ? true : false,
     message:
       shifts.rows.length > 0
         ? 'Lấy danh sách thành công.'
         : 'Không có dữ liệu.',
-    totalPage,
     shifts,
   });
 });
@@ -63,23 +42,8 @@ const getShiftById = asyncHandler(async (req, res) => {
     shift,
   });
 });
-const getShiftDetailById = asyncHandler(async (req, res) => {
-  const { shiftDetailId } = req.params;
-  console.log(shiftDetailId);
-  const shiftDetail = await shiftRepository.getShiftDetailAsync({
-    shiftDetailId,
-  });
-  return res.json({
-    success: shiftDetail ? true : false,
-    message: shiftDetail ? 'Lấy thành công.' : 'Lấy không thành công.',
-    shiftDetail,
-  });
-});
 
-// thêm
 const addShift = asyncHandler(async (req, res, next) => {
-  const { registrationDate } = req.body;
-
   const { userId } = req.user;
   const user = await authRepository.findByIdAsync(userId);
   if (!user) {
@@ -88,105 +52,74 @@ const addShift = asyncHandler(async (req, res, next) => {
 
   req.body.centerId = user.centerId;
 
-  const existShift = await shiftRepository.getShiftAsync({
-    registrationDate,
-    centerId: user.centerId,
-  });
-
-  if (existShift)
-    return throwErrorWithStatus(
-      statusCode.BAD_REQUEST,
-      'Ngày làm việc đã tồn tại.',
-      res,
-      next
-    );
-
   const newShift = await shiftRepository.addShiftAsync(req.body);
-
-  if (newShift) {
-    // Tạo các shift_detail tương ứng
-    const shiftDetails = [
-      {
-        startTime: '07:30',
-        endTime: '09:30',
-        quantity: 0,
-        maxQuantity: 10,
-        status: 1,
-        shiftId: newShift.shiftId,
-      },
-      {
-        startTime: '09:30',
-        endTime: '11:30',
-        quantity: 0,
-        maxQuantity: 10,
-        status: 1,
-        shiftId: newShift.shiftId,
-      },
-      {
-        startTime: '13:30',
-        endTime: '15:00',
-        quantity: 0,
-        maxQuantity: 10,
-        status: 1,
-        shiftId: newShift.shiftId,
-      },
-      {
-        startTime: '15:00',
-        endTime: '6:00',
-        quantity: 0,
-        maxQuantity: 10,
-        status: 1,
-        shiftId: newShift.shiftId,
-      },
-    ];
-
-    // Thêm các shift_detail vào cơ sở dữ liệu
-    await db.ShiftDetail.bulkCreate(shiftDetails);
-  }
 
   return res.json({
     success: newShift ? true : false,
     message: newShift
-      ? 'Thêm ngày làm việc thành công.'
+      ? 'Thêm ca làm việc thành công.'
       : 'Thêm ngày làm việc không thành công.',
     newShift,
   });
 });
-// thêm shift detail
-const addShiftDetail = asyncHandler(async (req, res, next) => {
-  const { shiftId } = req.params;
-  req.body.quantity = 0;
-  req.body.shiftId = shiftId;
-  console.log(req.body);
-  const response = await shiftRepository.addShiftDetailAsync(req.body);
-  return res.json({
-    success: response ? true : false,
-    message: response ? 'Thêm ca thành công.' : 'Thêm ca không thành công.',
-    newShiftDetail: response,
-  });
-});
+
+// // thêm shift detail
+// const addShiftDetail = asyncHandler(async (req, res, next) => {
+//   const { shiftId } = req.params;
+//   req.body.quantity = 0;
+//   req.body.shiftId = shiftId;
+//   console.log(req.body);
+//   const response = await shiftRepository.addShiftDetailAsync(req.body);
+//   return res.json({
+//     success: response ? true : false,
+//     message: response ? 'Thêm ca thành công.' : 'Thêm ca không thành công.',
+//     newShiftDetail: response,
+//   });
+// });
 
 // update
+// const updateShift = asyncHandler(async (req, res, next) => {
+//   const { shiftId } = req.params;
+
+//   const { registrationDate } = req.body;
+//   const { userId } = req.user;
+//   const user = await authRepository.findByIdAsync(userId);
+//   if (!user) {
+//     return;
+//   }
+//   const existShift = await shiftRepository.getShiftAsync({
+//     registrationDate,
+//   });
+
+//   if (existShift)
+//     return throwErrorWithStatus(
+//       statusCode.BAD_REQUEST,
+//       'Ngày làm việc đã tồn tại.',
+//       res,
+//       next
+//     );
+
+//   const newShift = await shiftRepository.updateShiftAsync(
+//     req,
+//     shiftId,
+//     user.centerId
+//   );
+
+//   return res.json({
+//     success: newShift ? true : false,
+//     message: newShift
+//       ? 'Ngày làm việc cập nhật thành công.'
+//       : 'Ngày làm việc cập nhật thành công.',
+//   });
+// });
 const updateShift = asyncHandler(async (req, res, next) => {
   const { shiftId } = req.params;
 
-  const { registrationDate } = req.body;
   const { userId } = req.user;
   const user = await authRepository.findByIdAsync(userId);
   if (!user) {
     return;
   }
-  const existShift = await shiftRepository.getShiftAsync({
-    registrationDate,
-  });
-
-  if (existShift)
-    return throwErrorWithStatus(
-      statusCode.BAD_REQUEST,
-      'Ngày làm việc đã tồn tại.',
-      res,
-      next
-    );
 
   const newShift = await shiftRepository.updateShiftAsync(
     req,
@@ -231,7 +164,7 @@ const deleteShift = asyncHandler(async (req, res, next) => {
   if (!existShift)
     return throwErrorWithStatus(
       statusCode.NOTFOUND,
-      'Ngày làm việc không tồn tại.',
+      'Ca đăng kiểm không tồn tại.',
       res,
       next
     );
@@ -243,8 +176,8 @@ const deleteShift = asyncHandler(async (req, res, next) => {
   return res.json({
     success: response ? true : false,
     message: response
-      ? 'Xóa ngày làm việc thành công.'
-      : 'Xóa ngày làm việc thất bại.',
+      ? 'Xóa ca đăng kiểm thành công.'
+      : 'Xóa ca đăng kiểm thất bại.',
   });
 });
 // xoa shift detail
@@ -279,8 +212,8 @@ module.exports = {
   addShift,
   updateShift,
   deleteShift,
-  addShiftDetail,
+
   deleteShiftDetail,
-  getShiftDetailById,
+
   updateShiftDetail,
 };

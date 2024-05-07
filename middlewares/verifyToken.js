@@ -41,6 +41,16 @@ const isStaffOfCenter = async (req, res, next) => {
 
   const role = await db.Role.findByPk(roleId);
 
+  if (role?.roleName !== 'staff') {
+    return throwErrorWithStatus(401, 'Bạn không có quyền truy cập', res, next);
+  }
+  next();
+};
+const isAllOfCenter = async (req, res, next) => {
+  const { roleId } = req.user;
+
+  const role = await db.Role.findByPk(roleId);
+
   if (role?.roleName !== 'center' && role?.roleName !== 'staff') {
     return throwErrorWithStatus(401, 'Bạn không có quyền truy cập', res, next);
   }
@@ -52,4 +62,5 @@ module.exports = {
   isAdmin,
   isCenter,
   isStaffOfCenter,
+  isAllOfCenter,
 };

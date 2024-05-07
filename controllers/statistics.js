@@ -1,6 +1,10 @@
 const asyncHandler = require('express-async-handler');
 const statusCode = require('../utils/statusCode');
-const { shiftRepository, authRepository } = require('../repositories');
+const {
+  shiftRepository,
+  authRepository,
+  centerRepository,
+} = require('../repositories');
 const { Op } = require('sequelize');
 const { throwErrorWithStatus } = require('../middlewares/errorHandler');
 const db = require('../models');
@@ -157,8 +161,66 @@ const getStatisticsAppointments = asyncHandler(async (req, res) => {
   });
 });
 
+const getStatisticsAppointmentsYearAndMonth = asyncHandler(async (req, res) => {
+  const { userId } = req.user;
+
+  const user = await authRepository.findByIdAsync(userId);
+  let centerId;
+  if (user) {
+    centerId = user.centerId;
+  }
+
+  const { year, month } = req.query;
+
+  // Xác định năm và tháng hiện tại nếu không có đầu vào được cung cấp
+  const currentDate = new Date();
+  const currentYear = year ? parseInt(year, 10) : currentDate.getFullYear();
+  const currentMonth = month ? parseInt(month, 10) : currentDate.getMonth() + 1;
+
+  const totalAppointments = await db.Appointment.count({
+    where: {
+      centerId: centerId,
+      [Op.and]: [
+        db.Sequelize.where(
+          db.Sequelize.fn('MONTH', db.Sequelize.col('appointment_date')),
+          month
+        ),
+        db.Sequelize.where(
+          db.Sequelize.fn('YEAR', db.Sequelize.col('appointment_date')),
+          year
+        ),
+      ],
+    },
+  });
+
+  const doneAppointments =
+    await centerRepository.countAppointmentOfMonthAndYearAsync(
+      centerId,
+      'đã hoàn thành',
+      month,
+      year
+    );
+
+  const cancelAppointments =
+    await centerRepository.countAppointmentOfMonthAndYearAsync(
+      centerId,
+      'đã hủy',
+      month,
+      year
+    );
+
+  return res.json({
+    success: totalAppointments >= 0 ? true : false,
+    message: `Dữ liệu của trung tâm tháng ${month} năm ${year}`,
+    totalAppointments,
+    doneAppointments,
+    cancelAppointments,
+  });
+});
+
 module.exports = {
   getStatisticsCenters,
   getStatisticsUsers,
   getStatisticsAppointments,
+  getStatisticsAppointmentsYearAndMonth,
 };

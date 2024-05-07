@@ -4,27 +4,12 @@ const { DataTypes } = require('sequelize');
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Shift_Details', {
-      shiftDetailId: {
+    await queryInterface.createTable('Work_Day_Shifts', {
+      workDayShiftId: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        field: 'shift_detail_id',
-      },
-      startTime: {
-        type: DataTypes.TIME,
-        allowNull: false,
-        field: 'start_time',
-      },
-      endTime: {
-        type: DataTypes.TIME,
-        allowNull: false,
-        field: 'end_time',
-      },
-      quantity: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
+        field: 'work_day_shift_id',
       },
       maxQuantity: {
         type: DataTypes.INTEGER,
@@ -32,7 +17,7 @@ module.exports = {
         field: 'max_quantity',
       },
       status: {
-        type: DataTypes.ENUM('Đang nhận lịch', 'Ngưng nhận lịch', 'Đã đầy'),
+        type: DataTypes.ENUM('Đang nhận lịch', 'Ngưng Nhận lịch', 'Đã đầy'),
         allowNull: false,
         defaultValue: 'Đang nhận lịch',
       },
@@ -43,6 +28,16 @@ module.exports = {
         references: {
           model: 'shifts',
           key: 'shift_id',
+        },
+        onDelete: 'CASCADE',
+      },
+      workDayId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: 'work_day_id',
+        references: {
+          model: 'work_days',
+          key: 'work_day_id',
         },
         onDelete: 'CASCADE',
       },
@@ -57,6 +52,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ShiftDetails');
+    await queryInterface.dropTable('WorkDayShifts');
   },
 };

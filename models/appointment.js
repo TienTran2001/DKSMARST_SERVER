@@ -12,8 +12,8 @@ module.exports = (sequelize, DataTypes) => {
       Appointment.belongsTo(models.Vehicle, { foreignKey: 'vehicleId' });
       Appointment.belongsTo(models.Center, { foreignKey: 'centerId' });
       Appointment.belongsTo(models.User, { foreignKey: 'userId' });
-      Appointment.belongsTo(models.ShiftDetail, {
-        foreignKey: 'shiftDetailId',
+      Appointment.belongsTo(models.WorkDayShift, {
+        foreignKey: 'workDayShiftId',
       });
     }
   }
@@ -34,13 +34,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         field: 'note',
       },
-      shiftDetailId: {
+      workDayShiftId: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        field: 'shift_detail_id',
+        field: 'work_day_shift_id',
         references: {
-          model: 'shift_details',
-          key: 'shift_detail_id',
+          model: 'work_day_shifts',
+          key: 'work_day_shift_id',
         },
       },
       vehicleId: {
