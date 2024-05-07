@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const db = require('../models');
 const dotenv = require('dotenv');
 dotenv.config();
+const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
 
 // lấy danh sách trung tam
@@ -42,6 +43,28 @@ const deleteCenterAsync = asyncHandler(async (centerId) => {
   return await db.Center.destroy({ where: { centerId } });
 });
 
+const countAppointmentOfMonthAndYearAsync = asyncHandler(
+  async (centerId, status, month, year) => {
+    const appointments = await db.Appointment.count({
+      where: {
+        centerId: centerId,
+        status: status,
+        [Op.and]: [
+          db.Sequelize.where(
+            db.Sequelize.fn('MONTH', db.Sequelize.col('appointment_date')),
+            month
+          ),
+          db.Sequelize.where(
+            db.Sequelize.fn('YEAR', db.Sequelize.col('appointment_date')),
+            year
+          ),
+        ],
+      },
+    });
+    return appointments;
+  }
+);
+
 module.exports = {
   getAllCenterAsync,
   getCenterByNameAsync,
@@ -49,4 +72,5 @@ module.exports = {
   getCenterById,
   updateCenterAsync,
   deleteCenterAsync,
+  countAppointmentOfMonthAndYearAsync,
 };

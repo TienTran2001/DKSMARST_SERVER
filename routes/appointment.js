@@ -7,6 +7,7 @@ const {
   verifyToken,
   isAdmin,
   isCenter,
+  isAllOfCenter,
   isStaffOfCenter,
 } = require('../middlewares/verifyToken');
 
@@ -15,7 +16,7 @@ router.get('', verifyToken, controllers.getAllAppointmentOfUser);
 router.get(
   '/center',
   verifyToken,
-  isStaffOfCenter,
+  isAllOfCenter,
   controllers.getAllAppointmentOfCenter
 );
 router.get('/:appointmentId', verifyToken, controllers.getAppointment);
@@ -26,7 +27,7 @@ router.post(
     Joi.object({
       appointmentDate: stringReq,
       note: string,
-      shiftDetailId: numberReq,
+      workDayShiftId: numberReq,
       vehicleId: numberReq,
       centerId: numberReq,
     })

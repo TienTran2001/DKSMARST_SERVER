@@ -1,7 +1,7 @@
 'use strict';
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class ShiftDetail extends Model {
+  class WorkDayShift extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -9,30 +9,19 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      WorkDayShift.belongsTo(models.Shift, { foreignKey: 'shiftId' });
+      WorkDayShift.hasMany(models.Appointment, {
+        foreignKey: 'workDayShiftId',
+      });
     }
   }
-  ShiftDetail.init(
+  WorkDayShift.init(
     {
-      shiftDetailId: {
+      workDayShiftId: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        field: 'shift_detail_id',
-      },
-      startTime: {
-        type: DataTypes.TIME,
-        allowNull: false,
-        field: 'start_time',
-      },
-      endTime: {
-        type: DataTypes.TIME,
-        allowNull: false,
-        field: 'end_time',
-      },
-      quantity: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
+        field: 'work_day_shift_id',
       },
       maxQuantity: {
         type: DataTypes.INTEGER,
@@ -54,12 +43,22 @@ module.exports = (sequelize, DataTypes) => {
         },
         onDelete: 'CASCADE',
       },
+      workDayId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: 'work_day_id',
+        references: {
+          model: 'work_days',
+          key: 'work_day_id',
+        },
+        onDelete: 'CASCADE',
+      },
     },
     {
       sequelize,
-      modelName: 'ShiftDetail',
-      tableName: 'shift_details',
+      modelName: 'WorkDayShift',
+      tableName: 'work_day_shifts',
     }
   );
-  return ShiftDetail;
+  return WorkDayShift;
 };

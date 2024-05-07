@@ -5,6 +5,7 @@ const {
   appointmentRepository,
   shiftRepository,
   authRepository,
+  workDayShiftRepository,
 } = require('../repositories');
 const { throwErrorWithStatus } = require('../middlewares/errorHandler');
 const { Op } = require('sequelize');
@@ -129,7 +130,7 @@ const getAppointment = asyncHandler(async (req, res) => {
 
 // thêm lịch hẹn
 const addAppointment = asyncHandler(async (req, res, next) => {
-  const { vehicleId, shiftDetailId } = req.body;
+  const { vehicleId, workDayShiftId } = req.body;
   const { userId } = req.user;
   req.body.userId = userId;
   console.log(req.body);
@@ -149,13 +150,13 @@ const addAppointment = asyncHandler(async (req, res, next) => {
       res,
       next
     );
-  const shiftDetail = await shiftRepository.getShiftDetailAsync({
-    shiftDetailId,
+  const workDayShift = await workDayShiftRepository.getWorkDayShiftAsync({
+    workDayShiftId,
   });
-  console.log(shiftDetail);
+
   if (
-    shiftDetail?.status == 'Đã đầy' ||
-    shiftDetail?.status == 'Ngưng nhận lịch'
+    workDayShift?.status == 'Đã đầy' ||
+    workDayShift?.status == 'Ngưng nhận lịch'
   ) {
     return throwErrorWithStatus(
       statusCode.BAD_REQUEST,
@@ -170,7 +171,6 @@ const addAppointment = asyncHandler(async (req, res, next) => {
   );
   let appointment;
   if (newAppointment) {
-    await shiftRepository.incrementQuantity(shiftDetailId);
     appointment = await appointmentRepository.findAppointmentAsync({
       appointmentId: newAppointment.appointmentId,
     });
@@ -224,6 +224,7 @@ const cancelAppointment = asyncHandler(async (req, res, next) => {
 
   const data = {};
   data.status = 'đã hủy';
+  data.note = req.body.note;
   const appointment = await appointmentRepository.findAppointmentAsync({
     appointmentId,
   });
@@ -232,10 +233,6 @@ const cancelAppointment = asyncHandler(async (req, res, next) => {
     data,
     appointmentId
   );
-
-  if (response) {
-    await shiftRepository.decrementQuantity(appointment.shiftDetailId);
-  }
 
   return res.json({
     success: response ? true : false,

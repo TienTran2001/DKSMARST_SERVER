@@ -1,25 +1,19 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 const { DataTypes } = require('sequelize');
-
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Shifts', {
-      shiftId: {
+    await queryInterface.createTable('Work_Days', {
+      workDayId: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        field: 'shift_id',
+        field: 'work_day_id',
       },
-      startTime: {
-        type: DataTypes.TIME,
+      inspectionDate: {
+        type: DataTypes.DATE,
         allowNull: false,
-        field: 'start_time',
-      },
-      endTime: {
-        type: DataTypes.TIME,
-        allowNull: false,
-        field: 'end_time',
+        field: 'inspection_date',
       },
       centerId: {
         type: DataTypes.INTEGER,
@@ -41,6 +35,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Shifts');
+    await queryInterface.dropTable('WorkDays');
   },
 };

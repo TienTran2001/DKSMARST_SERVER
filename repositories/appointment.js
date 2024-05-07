@@ -19,7 +19,14 @@ const findAppointmentAsync = asyncHandler(async (query) => {
         // where: keyword,
       },
       {
-        model: db.ShiftDetail,
+        model: db.WorkDayShift,
+        attributes: ['shiftId'],
+        include: [
+          {
+            model: db.Shift,
+            attributes: ['startTime', 'endTime'],
+          },
+        ],
         // where: keyword,
       },
       {
@@ -47,12 +54,19 @@ const getAllAppointmentAsync = asyncHandler(async (query, keyword, options) => {
         // where: keyword,
       },
       {
-        model: db.ShiftDetail,
+        model: db.WorkDayShift,
+        attributes: ['shiftId'],
+        include: [
+          {
+            model: db.Shift,
+          },
+        ],
         // where: keyword,
       },
       {
         model: db.User,
         attributes: ['fullname', 'phone'],
+
         // where: keyword,
       },
     ],
