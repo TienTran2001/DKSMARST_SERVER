@@ -9,7 +9,7 @@ console.log('cổng: ', process.env.PORT);
 const app = express();
 app.use(
   cors({
-    origin: 'https://dksmart-client.vercel.app/', // thay port client ở đây
+    origin: '*', // thay port client ở đây
   })
 );
 
