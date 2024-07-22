@@ -14,6 +14,8 @@ const workDayShift = require('./workDayShift');
 const appointment = require('./appointment');
 const news = require('./news');
 const statistics = require('./statistics');
+const laravel = require('./laravel');
+
 dotenv.config();
 
 const initRoutes = (app) => {
@@ -28,6 +30,7 @@ const initRoutes = (app) => {
   app.use(`/api/v1/appointments`, appointment);
   app.use(`/api/v1/news`, news);
   app.use(`/api/v1/statistics`, statistics);
+  app.use(`/api/v1/laravel`, laravel);
 
   app.use(badRequestException);
   app.use(errHandler);
